@@ -71,7 +71,7 @@ public class Ledger {
             writer.write(t.toCSV());  // Write the transaction's data in CSV format
             writer.newLine();
         } catch (IOException e) {
-            System.out.println("Error saving transaction: " + e.getMessage());
+            System.out.println("Transaction unsuccessful: " + e.getMessage());
         }
     }
 
