@@ -1,6 +1,7 @@
 package com.pluralsight;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 public class Transaction {
 
@@ -18,20 +19,28 @@ public class Transaction {
             this.amount = amount;
         }
 
-        public LocalDate getDate() { return date; }
-        public LocalTime getTime() { return time; }
-        public String getDescription() { return description; }
-        public String getVendor() { return vendor; }
-        public double getAmount() { return amount; }
+    public LocalDate getDate() {
+        return date;
+    }
 
-        public String toCSV() {
+    public double getAmount() { return amount; }
+
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String toCSV() {
             return date + "|" + time + "|" + description + "|" + vendor + "|" + amount;
         }
 
-        @Override
-        public String toString() {
-            return date + " | " + time + " | " + description + " | " + vendor + " | " + amount;
-        }
 
 
+    public String toString() {
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+
+        return date.format(dateFormatter) + " | " + time.format(timeFormatter)
+                + " | " + description + " | " + vendor + " | " + amount;
+    }
 }

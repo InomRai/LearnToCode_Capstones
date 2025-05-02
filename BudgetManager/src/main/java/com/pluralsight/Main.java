@@ -9,20 +9,22 @@ public class Main {
         Scanner scanner = new Scanner(System.in); //to read user input
         Ledger ledger = new Ledger(); //to manage transaction
 
-// Main loop: keeps showing the menu until the user exits
+        // Main menu loop: runs until user chooses to exit
         while (true) {
+            // Display main menu options
             System.out.println("\n<Home Menu>");
             System.out.println("D) Add Deposit");
             System.out.println("P) Make Payment");
             System.out.println("L) View Ledger");
+            System.out.println("R) View Reports");
             System.out.println("X) Exit");
             System.out.print("Choose option: ");
-            String choice = scanner.nextLine().toUpperCase(); // Read input and convert to uppercase
 
+            String choice = scanner.nextLine().toUpperCase(); // Read and normalize user input
 
-            // Use switch to decide what to do based on user input
+            // Determine what to do based on user's menu choice
             switch (choice) {
-                case "D": // if user choose D
+                case "D":
                     addTransaction(scanner, ledger, true); // call the method to deposit
                     break;
                 case "P":
@@ -31,55 +33,61 @@ public class Main {
                 case "L":
                     showLedger(scanner, ledger);
                     break;
+                case "R":
+                    showReports(scanner, ledger);
+                    break;
                 case "X":
                     System.out.println("Exiting...");
                     return;
                 default:
-                    System.out.println("Invalid option.");  // Show error
+                    System.out.println("Invalid option."); // show error
             }
         }
     }
 
-
-    // Method to add a deposit or payment
+    // Method to add a deposit or a payment
     public static void addTransaction(Scanner scanner, Ledger ledger, boolean isDeposit) {
         try {
-            LocalDate date = LocalDate.now(); // for date
-            LocalTime time = LocalTime.now(); // for time
+            // Automatically set the date and time of transaction to now
+            LocalDate date = LocalDate.now();
+            LocalTime time = LocalTime.now();
 
-            System.out.print("Description: "); // prompt and read transaction
+            // Ask user for transaction description
+            System.out.print("Description: ");
             String description = scanner.nextLine();
 
+            // Ask user for vendor (who you paid or received money from)
             System.out.print("Vendor: ");
             String vendor = scanner.nextLine();
 
+            // Ask user for amount and convert to double
             System.out.print("Amount: ");
             double amount = Double.parseDouble(scanner.nextLine());
 
-
+            // If it's a payment, make sure the amount is negative
             if (!isDeposit) {
-                amount = Math.abs(amount); // If it's a payment, make the amount negative
+                amount = -Math.abs(amount);
             }
 
-
-                //check if amount is negative
-            if (amount < 0) {
-                System.out.println("Amount cannot be negative. Try again");
+            // Prevent zero amount transactions
+            if (amount == 0) {
+                System.out.println("Amount cannot be zero. Try again.");
                 return;
             }
 
-
-            // Create the transaction and save
+            // Create the transaction and add it to the ledger
             Transaction t = new Transaction(date, time, description, vendor, amount);
             ledger.addTransaction(t);
             System.out.println("Transaction successful.");
         } catch (DateTimeParseException | NumberFormatException e) {
-            System.out.println("Invalid input. Try again.");
+            System.out.println("Invalid input. Try again."); //show error
         }
     }
 
-    // Method to show ledger entries
+
+    // Method to display transactions (ledger view)
     public static void showLedger(Scanner scanner, Ledger ledger) {
+        // Show ledger menu
         System.out.println("\n<Ledger View>");
         System.out.println("A) All Transactions");
         System.out.println("D) Deposits Only");
@@ -87,23 +95,25 @@ public class Main {
         System.out.print("Choose option: ");
         String choice = scanner.nextLine().toUpperCase();
 
-        List<Transaction> transactions;
+        List<Transaction> transactions; // List to store results
 
+        // Determine which transactions to show
         switch (choice) {
             case "A":
-                transactions = ledger.getAll(); // Get all entries
+                transactions = ledger.getAll(); // All transactions
                 break;
             case "D":
-                transactions = ledger.getDeposits(); // Get only deposits
+                transactions = ledger.getDeposits(); // Only positive amounts
                 break;
             case "P":
-                transactions = ledger.getPayments(); // Get only payments
+                transactions = ledger.getPayments(); // Only negative amounts
                 break;
             default:
                 System.out.println("Invalid option.");
                 return;
         }
 
+        // Print out results
         if (transactions.isEmpty()) {
             System.out.println("No transactions found.");
         } else {
@@ -112,4 +122,47 @@ public class Main {
             }
         }
     }
+
+    // Method to display reports like month-to-date, year-to-date, or search
+    public static void showReports(Scanner scanner, Ledger ledger) {
+        // Show report options
+        System.out.println("\n<Reports>");
+        System.out.println("1) Month To Date");
+        System.out.println("2) Year To Date");
+        System.out.println("3) Search by Vendor");
+        System.out.print("Choose option: ");
+        String choice = scanner.nextLine().trim(); // Clean up input
+
+        List<Transaction> results; // To store report output
+
+
+        switch (choice) {
+            case "1":
+                results = ledger.getMonthToDate(); // This month only
+                break;
+            case "2":
+                results = ledger.getYearToDate(); // This year only
+                break;
+            case "3":
+                System.out.print("Enter keyword to search: ");
+                String keyword = scanner.nextLine().trim(); // Read search keyword
+                results = ledger.searchByVendor(keyword); // Search in descriptions
+                break;
+            default:
+                System.out.println("Invalid option.");
+                return;
+        }
+
+
+        if (results.isEmpty()) {
+            System.out.println("No transactions found.");
+        } else {
+            for (Transaction t : results) {
+                System.out.println(t); // Formatted output from Transaction
+            }
+        }
+    }
 }
+
+
+

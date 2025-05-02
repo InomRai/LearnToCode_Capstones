@@ -100,4 +100,37 @@ public class Ledger {
         }
         return payments;
     }
+
+
+    public List<Transaction> getMonthToDate() {
+        LocalDate now = LocalDate.now();
+        List<Transaction> result = new ArrayList<>();
+        for (Transaction t : transactions) {
+            if (t.getDate().getMonth() == now.getMonth() && t.getDate().getYear() == now.getYear()) {
+                result.add(t);
+            }
+        }
+        return result;
+    }
+
+    public List<Transaction> getYearToDate() {
+        LocalDate now = LocalDate.now();
+        List<Transaction> result = new ArrayList<>();
+        for (Transaction t : transactions) {
+            if (t.getDate().getYear() == now.getYear()) {
+                result.add(t);
+            }
+        }
+        return result;
+    }
+
+    public List<Transaction> searchByVendor(String keyword) {
+        List<Transaction> result = new ArrayList<>();
+        for (Transaction t : transactions) {
+            if (t.getDescription().toLowerCase().contains(keyword.toLowerCase())) {
+                result.add(t);
+            }
+        }
+        return result;
+    }
 }
